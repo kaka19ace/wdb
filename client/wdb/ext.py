@@ -98,6 +98,7 @@ class WdbMiddleware(object):
 
 def wdb_tornado(application, start_disabled=False):
     from tornado.web import RequestHandler, HTTPError
+    from tornado import gen
     Wdb.enabled = not start_disabled
 
     class WdbOn(RequestHandler):
@@ -119,7 +120,7 @@ def wdb_tornado(application, start_disabled=False):
             # Close set_trace debuggers
             stop_trace(close_on_exit=True)
 
-    RequestHandler._execute = _wdb_execute
+    RequestHandler._execute = gen.coroutine(_wdb_execute)
 
     def _wdb_error_writter(self, status_code, **kwargs):
         silent = False
